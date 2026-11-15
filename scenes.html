@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8"/>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --cyan: #22d3ee; --indigo: #6366f1; --violet: #a855f7; --green: #34d399;
+    --grad: linear-gradient(120deg, #22d3ee, #6366f1 55%, #a855f7);
+  }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; background: #070916; }
+  #stage {
+    position: relative; width: 1080px; height: 1920px;
+    font-family: "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif;
+    color: #eef2ff; background:
+      radial-gradient(130% 80% at 50% -10%, #1b1247 0%, #0b0d22 45%, #070916 100%);
+    overflow: hidden;
+  }
+  .bg-glow { position: absolute; border-radius: 50%; filter: blur(90px); opacity: .5; }
+  .g1 { width: 760px; height: 760px; background: #0ea5e9; left: -220px; top: -140px; }
+  .g2 { width: 820px; height: 820px; background: #7c3aed; right: -260px; top: 520px; }
+  .g3 { width: 620px; height: 620px; background: #db2777; left: 20%; bottom: -260px; opacity: .3; }
+
+  .scene { position: absolute; inset: 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; will-change: opacity, transform; }
+
+  .kicker { font-size: 34px; font-weight: 700; letter-spacing: .32em; text-transform: uppercase;
+    color: rgba(226,232,255,.55); }
+  .big { font-weight: 800; letter-spacing: -.02em; line-height: .98; text-align: center; }
+  .accent { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .sub { font-size: 40px; font-weight: 500; color: rgba(226,232,255,.72); text-align: center; }
+
+  /* speedometer number */
+  #heroNum { font-size: 250px; font-weight: 800; letter-spacing: -.04em; font-variant-numeric: tabular-nums;
+    display: flex; align-items: baseline; justify-content: center; gap: 16px; }
+  #heroNum small { font-size: 74px; font-weight: 700; color: rgba(226,232,255,.7); }
+
+  .ring { position: absolute; border-radius: 50%; }
+
+  /* comparison bars */
+  .bars { width: 860px; display: flex; flex-direction: column; gap: 60px; }
+  .barRow { }
+  .barHead { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 18px; }
+  .barName { font-size: 46px; font-weight: 700; }
+  .barVal { font-size: 54px; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .barTrack { height: 56px; border-radius: 30px; background: rgba(255,255,255,.08);
+    border: 1px solid rgba(255,255,255,.12); overflow: hidden; }
+  .barFill { height: 100%; border-radius: 30px; }
+  .fillGray { background: linear-gradient(90deg, #64748b, #94a3b8); }
+  .fillGrad { background: var(--grad); box-shadow: 0 0 40px rgba(99,102,241,.6); }
+
+  /* app window 3D */
+  .persp { perspective: 1700px; }
+  #appCard { width: 940px; border-radius: 28px; overflow: hidden;
+    box-shadow: 0 60px 160px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.08);
+    transform-style: preserve-3d; }
+  #appCard img { width: 100%; display: block; }
+
+  /* diagram */
+  .flow { display: flex; align-items: center; gap: 0; }
+  .node { width: 220px; height: 220px; border-radius: 34px; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 14px; background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.14); backdrop-filter: blur(8px); }
+  .node .ic { font-size: 74px; line-height: 1; }
+  .node .lb { font-size: 30px; font-weight: 700; }
+  .wire { width: 150px; height: 6px; position: relative; }
+  .wireBase { position: absolute; inset: 0; border-radius: 6px; background: rgba(255,255,255,.12); }
+  .pkt { position: absolute; top: -5px; width: 26px; height: 16px; border-radius: 8px;
+    background: #fff; box-shadow: 0 0 16px #fff; }
+
+  /* CTA */
+  #ctaLogo { width: 300px; height: 300px; filter: drop-shadow(0 30px 70px rgba(99,102,241,.6)); }
+  .url { font-family: "Cascadia Mono", Consolas, monospace; font-size: 40px; font-weight: 600;
+    color: var(--cyan); letter-spacing: .01em; }
+
+  .wm { position: absolute; bottom: 70px; left: 0; right: 0; text-align: center;
+    font-size: 30px; font-weight: 600; letter-spacing: .14em; color: rgba(226,232,255,.4); }
+</style>
+</head>
+<body>
+<div id="stage">
+  <i class="bg-glow g1"></i><i class="bg-glow g2"></i><i class="bg-glow g3"></i>
+
+  <!-- A: HOOK -->
+  <section class="scene" id="sA">
+    <div class="kicker" style="position:absolute; top:560px; left:0; right:0; text-align:center">T E L T U N</div>
+    <svg width="720" height="720" viewBox="0 0 720 720" style="position:absolute; top:600px; left:180px">
+      <circle cx="360" cy="360" r="330" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="24"
+        stroke-linecap="round" stroke-dasharray="1555 2073" transform="rotate(135 360 360)"/>
+      <circle id="gauge" cx="360" cy="360" r="330" fill="none" stroke="url(#gg)" stroke-width="24"
+        stroke-linecap="round" stroke-dasharray="0 3000" transform="rotate(135 360 360)"/>
+      <defs><linearGradient id="gg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#22d3ee"/><stop offset=".5" stop-color="#6366f1"/><stop offset="1" stop-color="#a855f7"/>
+      </linearGradient></defs>
+    </svg>
+    <div id="heroNum" style="position:absolute; top:960px; left:0; right:0; transform-origin:center"><span id="hn">0</span><small>Mbps</small></div>
+    <div class="sub" style="position:absolute; top:1420px; left:0; right:0">USB kablosuyla. Telefondan.</div>
+  </section>
+
+  <!-- B: COMPARE -->
+  <section class="scene" id="sB">
+    <div class="big" style="font-size:72px; margin-bottom:90px">Aynı telefon.<br/><span class="accent">5 kat hız.</span></div>
+    <div class="bars">
+      <div class="barRow">
+        <div class="barHead"><span class="barName" style="color:rgba(226,232,255,.7)">PdaNet+</span>
+          <span class="barVal" style="color:#94a3b8"><span id="pv">0</span> Mbps</span></div>
+        <div class="barTrack"><div class="barFill fillGray" id="pbar" style="width:0%"></div></div>
+      </div>
+      <div class="barRow">
+        <div class="barHead"><span class="barName">TelTun</span>
+          <span class="barVal accent"><span id="tv">0</span> Mbps</span></div>
+        <div class="barTrack"><div class="barFill fillGrad" id="tbar" style="width:0%"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- C: APP 3D -->
+  <section class="scene" id="sC">
+    <div class="big" style="font-size:66px; margin-bottom:70px">Tek program.<br/><span class="accent">Tek tık.</span></div>
+    <div class="persp"><div id="appCard"><img src="assets/ui/connected.png" alt=""/></div></div>
+  </section>
+
+  <!-- D: HOW -->
+  <section class="scene" id="sD">
+    <div class="kicker" style="margin-bottom:28px">N A S I L ?</div>
+    <div class="big" style="font-size:58px; margin-bottom:90px">Tek USB hattı,<br/><span class="accent">binlerce bağlantı.</span></div>
+    <div class="flow">
+      <div class="node"><span class="ic">💻</span><span class="lb">PC</span></div>
+      <div class="wire"><div class="wireBase"></div><div class="pkt" data-w="0"></div><div class="pkt" data-w="1"></div></div>
+      <div class="node" style="border-color:rgba(129,140,248,.6);background:rgba(99,102,241,.16)"><span class="ic">📱</span><span class="lb">Telefon</span></div>
+      <div class="wire"><div class="wireBase"></div><div class="pkt" data-w="2"></div><div class="pkt" data-w="3"></div></div>
+      <div class="node"><span class="ic">📡</span><span class="lb">İnternet</span></div>
+    </div>
+    <div class="sub" style="margin-top:90px; font-size:34px">Bağlantıları telefon açar — hepsi tek akışta.</div>
+  </section>
+
+  <!-- E: CTA -->
+  <section class="scene" id="sE">
+    <img id="ctaLogo" src="assets/logo.svg" alt=""/>
+    <div class="big" style="font-size:120px; margin:30px 0 14px">TelTun</div>
+    <div class="sub" style="font-size:36px; margin-bottom:60px">USB ile tam hız telefon interneti</div>
+    <div class="url">github.com/justech0/TelTun</div>
+  </section>
+
+  <div class="wm" id="wm">MADE BY ENES</div>
+</div>
+
+<script>
+const clamp = (x, a=0, b=1) => Math.max(a, Math.min(b, x));
+const lerp = (a, b, t) => a + (b - a) * t;
+const easeOut = t => 1 - Math.pow(1 - t, 3);
+const easeInOut = t => t < .5 ? 4*t*t*t : 1 - Math.pow(-2*t+2, 3)/2;
+// segment progress 0..1 within [s,e]
+const seg = (t, s, e) => clamp((t - s) / (e - s));
+// fade in/out window helper -> opacity for a scene active in [s,e] with fd fade
+function sceneOpacity(t, s, e, fd=0.12) {
+  if (t < s - fd || t > e + fd) return 0;
+  return clamp(Math.min((t - (s - fd)) / fd, ((e + fd) - t) / fd));
+}
+
+const SC = {
+  A: [0.0, 3.2], B: [3.45, 7.4], C: [7.65, 12.4], D: [12.65, 17.8], E: [18.05, 22.3],
+};
+const DUR = 22.5;
+
+function layout(t) {
+  // scene visibility + slight vertical drift for life
+  for (const [k, [s, e]] of Object.entries(SC)) {
+    const el = document.getElementById('s' + k);
+    const op = sceneOpacity(t, s, e);
+    el.style.opacity = op;
+    const local = seg(t, s - .45, e + .45);
+    el.style.transform = `translateY(${lerp(26, -26, local)}px)`;
+    el.style.pointerEvents = 'none';
+  }
+
+  // A — gauge + number count to 221
+  {
+    const p = easeOut(seg(t, 0.15, 2.3));
+    const val = Math.round(lerp(0, 221, p));
+    document.getElementById('hn').textContent = val;
+    // gauge: 0.75 circle = 270deg, circumference 2πr = 2073 for r=330
+    const circ = 2 * Math.PI * 330;
+    const vis = (val / 260) * 0.75 * circ;
+    document.getElementById('gauge').setAttribute('stroke-dasharray', `${vis} ${circ}`);
+    const hn = document.getElementById('heroNum');
+    const pop = 1 + 0.06 * Math.exp(-Math.pow((t - 2.35) * 4, 2));
+    hn.style.transform = `translateY(-50%) scale(${pop})`;
+  }
+
+  // B — bars race (gray to 40, grad to 221); scale: 221 -> 100%
+  {
+    const pg = easeOut(seg(t, 4.0, 5.0));
+    const pt = easeOut(seg(t, 4.6, 6.4));
+    const pval = Math.round(lerp(0, 40, pg));
+    const tval = Math.round(lerp(0, 221, pt));
+    document.getElementById('pv').textContent = pval;
+    document.getElementById('tv').textContent = tval;
+    document.getElementById('pbar').style.width = (40 / 221 * 100 * pg) + '%';
+    document.getElementById('tbar').style.width = (100 * pt) + '%';
+  }
+
+  // C — app window perspective float
+  {
+    const intro = easeOut(seg(t, 8.0, 9.2));
+    const ry = lerp(26, 10, intro);
+    const float = Math.sin((t - 8) * 1.1) * 3;
+    const card = document.getElementById('appCard');
+    card.style.transform =
+      `rotateY(${-ry + float}deg) rotateX(6deg) translateY(${lerp(50,0,intro)}px) scale(${lerp(.9,1,intro)})`;
+    card.style.opacity = intro;
+  }
+
+  // D — packets flowing along wires
+  {
+    document.querySelectorAll('#sD .pkt').forEach((pk, i) => {
+      const phase = (t * 0.9 + i * 0.37) % 1;
+      pk.style.left = (phase * 124) + 'px';
+      pk.style.opacity = Math.sin(phase * Math.PI);
+    });
+  }
+
+  // E — logo pop
+  {
+    const p = easeOut(seg(t, 18.5, 19.6));
+    const logo = document.getElementById('ctaLogo');
+    logo.style.transform = `scale(${lerp(.6, 1, p)}) rotate(${lerp(-12, 0, p)}deg)`;
+    logo.style.opacity = p;
+  }
+
+  // watermark only visible with a scene
+  const anyLate = t > 7.6;
+  document.getElementById('wm').style.opacity = clamp(Math.sin(clamp((t)/0.6))*0+ (t>0.3?1:0)) * 0.9;
+}
+window.renderAt = (t) => { layout(t); };
+window.VIDEO_DURATION = DUR;
+layout(0);
+</script>
+</body>
+</html>
